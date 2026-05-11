@@ -19,7 +19,7 @@ async function hasValidSession(request: NextRequest) {
   }
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const isProtected = protectedPaths.some((path) => pathname.startsWith(path));
 
