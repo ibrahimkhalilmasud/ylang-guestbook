@@ -79,13 +79,16 @@ export async function createStay(stay: Partial<Stay>) {
 
 export async function recalculateGuestMetrics(guestId: string) {
   const supabase = getSupabaseServerClient();
-  const { data: stays, error: stayError } = await supabase
-    .from("stays")
-    .select("*")
-    .eq("guest_id", guestId);
+  const [{ data: stays, error: stayError }, { data: guest, error: guestError }] = await Promise.all([
+    supabase.from("stays").select("*").eq("guest_id", guestId),
+    supabase.from("guests").select("tags").eq("id", guestId).single(),
+  ]);
   if (stayError) throw stayError;
+  if (guestError) throw guestError;
 
   const metrics = aggregateGuestFromStays((stays || []) as Stay[]);
+  const existingTags = ((guest?.tags as string[] | null) || []).filter((tag) => tag !== "returning guest");
+  const mergedTags = metrics.totalVisits > 1 ? [...new Set([...existingTags, "returning guest"])] : existingTags;
   const { error } = await supabase
     .from("guests")
     .update({
@@ -94,7 +97,7 @@ export async function recalculateGuestMetrics(guestId: string) {
       lifetime_spend: metrics.lifetimeSpend,
       last_stay: metrics.lastStay,
       vip_status: metrics.vipStatus,
-      tags: metrics.totalVisits > 1 ? ["returning guest"] : [],
+      tags: mergedTags,
     })
     .eq("id", guestId);
 

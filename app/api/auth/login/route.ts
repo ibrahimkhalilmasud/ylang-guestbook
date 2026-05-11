@@ -17,11 +17,11 @@ export async function POST(request: Request) {
     });
 
   const account = users.find((user) => user.email === email && user.password === password);
-  if (!account) {
+  if (!account || !account.email) {
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
   }
 
-  const token = await createSessionToken(account.email!, account.role);
+  const token = await createSessionToken(account.email, account.role);
   await setSessionCookie(token);
   return NextResponse.json({ ok: true });
 }

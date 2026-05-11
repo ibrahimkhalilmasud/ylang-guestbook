@@ -1,14 +1,33 @@
 import { NextResponse } from "next/server";
 import ExcelJS from "exceljs";
 import Papa from "papaparse";
-import { jsPDF } from "jspdf";
+import jsPDF from "jspdf";
 import { getGuestsWithStaysForExport } from "@/lib/db";
+
+const exportColumns = [
+  "full_name",
+  "email",
+  "phone",
+  "nationality",
+  "country",
+  "vip_status",
+  "total_visits",
+  "total_nights",
+  "lifetime_spend",
+  "last_stay",
+] as const;
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const format = searchParams.get("format") || "csv";
-    const data = await getGuestsWithStaysForExport();
+    const rows = await getGuestsWithStaysForExport();
+    const data = rows.map((row) =>
+      exportColumns.reduce<Record<string, unknown>>((acc, key) => {
+        acc[key] = row[key] ?? "";
+        return acc;
+      }, {}),
+    );
 
     if (format === "csv") {
       const csv = Papa.unparse(data);
@@ -23,7 +42,7 @@ export async function GET(request: Request) {
     if (format === "excel") {
       const workbook = new ExcelJS.Workbook();
       const sheet = workbook.addWorksheet("Guests");
-      sheet.columns = Object.keys(data[0] || { full_name: "", email: "" }).map((key) => ({
+      sheet.columns = exportColumns.map((key) => ({
         header: key,
         key,
         width: 20,
