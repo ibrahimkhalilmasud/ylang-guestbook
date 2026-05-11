@@ -4,6 +4,8 @@ import Papa from "papaparse";
 import jsPDF from "jspdf";
 import { getGuestsWithStaysForExport } from "@/lib/db";
 
+export const dynamic = "force-static";
+
 const exportColumns = [
   "full_name",
   "email",
