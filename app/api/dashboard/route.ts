@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDashboardStats } from "@/lib/db";
 
-export const dynamic = "force-static";
+export const revalidate = 1;
 
 export async function GET() {
   try {

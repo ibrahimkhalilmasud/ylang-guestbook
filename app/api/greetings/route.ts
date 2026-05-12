@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createGreeting, listGreetings } from "@/lib/db";
 
-export const dynamic = "force-static";
+export const revalidate = 1;
 
 const greetingSchema = z.object({
   guest_id: z.string().uuid(),
