@@ -7,6 +7,7 @@ const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(1),
 });
+const adminEmailSchema = z.string().email();
 
 const validRoles = new Set<Role>(ROLE_VALUES);
 
@@ -42,7 +43,7 @@ export async function POST(request: Request) {
     .filter(
       (entry): entry is { email: string; password: string; role: Role } =>
         typeof entry.email === "string" &&
-        entry.email.length > 0 &&
+        adminEmailSchema.safeParse(entry.email).success &&
         typeof entry.password === "string" &&
         entry.password.length > 0 &&
         entry.role !== null,
