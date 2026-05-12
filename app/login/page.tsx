@@ -17,7 +17,7 @@ export default function LoginPage() {
   function getSafeNextPath() {
     if (typeof window === "undefined") return null;
     const nextPath = new URLSearchParams(window.location.search).get("next");
-    if (!nextPath || !nextPath.startsWith("/") || nextPath.startsWith("//")) return null;
+    if (!nextPath || !nextPath.startsWith("/") || nextPath.startsWith("//") || nextPath.includes("\\")) return null;
     return nextPath;
   }
 

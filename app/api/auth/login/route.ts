@@ -8,9 +8,9 @@ const loginSchema = z.object({
   password: z.string().min(1),
 });
 
-function parseRole(role?: string): Role {
+function parseRole(role?: string): Role | null {
   if (role === "admin" || role === "manager") return role;
-  return "manager";
+  return null;
 }
 
 export async function POST(request: Request) {
@@ -36,7 +36,8 @@ export async function POST(request: Request) {
     .map((entry) => {
       const [entryEmail, entryPassword, role] = entry.split(":");
       return { email: entryEmail?.toLowerCase(), password: entryPassword, role: parseRole(role) };
-    });
+    })
+    .filter((entry): entry is { email: string; password: string; role: Role } => Boolean(entry.email && entry.password && entry.role));
 
   const account = users.find((user) => user.email === email && user.password === password);
   if (!account || !account.email) {
