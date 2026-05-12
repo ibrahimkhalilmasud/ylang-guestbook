@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
+const MAX_DECODE_ITERATIONS = 2;
+
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,7 +22,7 @@ export default function LoginPage() {
     if (!nextPath) return null;
 
     let decoded = nextPath;
-    for (let i = 0; i < 2; i += 1) {
+    for (let i = 0; i < MAX_DECODE_ITERATIONS; i += 1) {
       try {
         decoded = decodeURIComponent(decoded);
       } catch {

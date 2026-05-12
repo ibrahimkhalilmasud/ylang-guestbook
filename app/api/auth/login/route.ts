@@ -39,7 +39,14 @@ export async function POST(request: Request) {
       const [entryEmail, entryPassword, role] = entry.split(":");
       return { email: entryEmail?.toLowerCase(), password: entryPassword, role: parseRole(role) };
     })
-    .filter((entry): entry is { email: string; password: string; role: Role } => Boolean(entry.email && entry.password && entry.role));
+    .filter(
+      (entry): entry is { email: string; password: string; role: Role } =>
+        typeof entry.email === "string" &&
+        entry.email.length > 0 &&
+        typeof entry.password === "string" &&
+        entry.password.length > 0 &&
+        entry.role !== null,
+    );
 
   const account = users.find((user) => user.email === email && user.password === password);
   if (!account || !account.email) {
