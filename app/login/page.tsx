@@ -14,6 +14,13 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  function getSafeNextPath() {
+    if (typeof window === "undefined") return null;
+    const nextPath = new URLSearchParams(window.location.search).get("next");
+    if (!nextPath || !nextPath.startsWith("/") || nextPath.startsWith("//")) return null;
+    return nextPath;
+  }
+
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setLoading(true);
@@ -32,10 +39,7 @@ export default function LoginPage() {
       return;
     }
 
-    const nextPath =
-      typeof window !== "undefined"
-        ? new URLSearchParams(window.location.search).get("next")
-        : null;
+    const nextPath = getSafeNextPath();
     router.push(nextPath || "/dashboard");
     router.refresh();
   }

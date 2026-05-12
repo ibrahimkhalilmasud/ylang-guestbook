@@ -1,11 +1,33 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { createSessionToken, setSessionCookie } from "@/lib/auth";
 import type { Role } from "@/lib/types";
 
+const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1),
+});
+
+function parseRole(role?: string): Role {
+  if (role === "admin" || role === "manager") return role;
+  return "manager";
+}
+
 export async function POST(request: Request) {
-  const body = await request.json();
-  const email = String(body.email || "").trim().toLowerCase();
-  const password = String(body.password || "");
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
+  }
+
+  const parsedBody = loginSchema.safeParse(body);
+  if (!parsedBody.success) {
+    return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
+  }
+
+  const email = parsedBody.data.email.trim().toLowerCase();
+  const password = parsedBody.data.password;
 
   const users = (process.env.ADMIN_USERS || "")
     .split(";")
@@ -13,7 +35,7 @@ export async function POST(request: Request) {
     .filter(Boolean)
     .map((entry) => {
       const [entryEmail, entryPassword, role] = entry.split(":");
-      return { email: entryEmail?.toLowerCase(), password: entryPassword, role: (role as Role) || "manager" };
+      return { email: entryEmail?.toLowerCase(), password: entryPassword, role: parseRole(role) };
     });
 
   const account = users.find((user) => user.email === email && user.password === password);
