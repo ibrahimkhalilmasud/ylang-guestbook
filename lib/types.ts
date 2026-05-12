@@ -1,4 +1,5 @@
-export type Role = "admin" | "manager";
+export const ROLE_VALUES = ["admin", "manager"] as const;
+export type Role = (typeof ROLE_VALUES)[number];
 
 export type GuestTag =
   | "VIP"

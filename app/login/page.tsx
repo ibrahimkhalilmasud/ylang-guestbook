@@ -7,12 +7,32 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
+const MAX_DECODE_ITERATIONS = 2;
+
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  function getSafeNextPath() {
+    if (typeof window === "undefined") return null;
+    const nextPath = new URLSearchParams(window.location.search).get("next");
+    if (!nextPath) return null;
+
+    let decoded = nextPath;
+    for (let i = 0; i < MAX_DECODE_ITERATIONS; i += 1) {
+      try {
+        decoded = decodeURIComponent(decoded);
+      } catch {
+        break;
+      }
+    }
+
+    if (!decoded.startsWith("/") || decoded.startsWith("//") || decoded.includes("\\")) return null;
+    return decoded;
+  }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -32,10 +52,7 @@ export default function LoginPage() {
       return;
     }
 
-    const nextPath =
-      typeof window !== "undefined"
-        ? new URLSearchParams(window.location.search).get("next")
-        : null;
+    const nextPath = getSafeNextPath();
     router.push(nextPath || "/dashboard");
     router.refresh();
   }
