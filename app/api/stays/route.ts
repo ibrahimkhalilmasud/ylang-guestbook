@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createStay, listStays } from "@/lib/db";
 
+export const dynamic = "force-static";
+
 const staySchema = z.object({
   guest_id: z.string().uuid(),
   arrival_date: z.string(),
