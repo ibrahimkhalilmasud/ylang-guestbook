@@ -8,8 +8,10 @@ const loginSchema = z.object({
   password: z.string().min(1),
 });
 
+const validRoles = new Set<Role>(["admin", "manager"]);
+
 function parseRole(role?: string): Role | null {
-  if (role === "admin" || role === "manager") return role;
+  if (role && validRoles.has(role as Role)) return role as Role;
   return null;
 }
 
