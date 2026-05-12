@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createTemplate, listTemplates } from "@/lib/db";
 
-export const revalidate = 1;
+export const dynamic = "force-static";
 
 const templateSchema = z.object({
   name: z.string().min(2),

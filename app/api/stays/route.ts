@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createStay, listStays } from "@/lib/db";
 
-export const revalidate = 1;
+export const dynamic = "force-static";
 
 const staySchema = z.object({
   guest_id: z.string().uuid(),
