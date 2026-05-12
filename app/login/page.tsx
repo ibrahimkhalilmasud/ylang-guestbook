@@ -17,8 +17,19 @@ export default function LoginPage() {
   function getSafeNextPath() {
     if (typeof window === "undefined") return null;
     const nextPath = new URLSearchParams(window.location.search).get("next");
-    if (!nextPath || !nextPath.startsWith("/") || nextPath.startsWith("//") || nextPath.includes("\\")) return null;
-    return nextPath;
+    if (!nextPath) return null;
+
+    let decoded = nextPath;
+    for (let i = 0; i < 2; i += 1) {
+      try {
+        decoded = decodeURIComponent(decoded);
+      } catch {
+        break;
+      }
+    }
+
+    if (!decoded.startsWith("/") || decoded.startsWith("//") || decoded.includes("\\")) return null;
+    return decoded;
   }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {

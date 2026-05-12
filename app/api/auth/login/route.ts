@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createSessionToken, setSessionCookie } from "@/lib/auth";
-import type { Role } from "@/lib/types";
+import { ROLE_VALUES, type Role } from "@/lib/types";
 
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(1),
 });
 
-const validRoles = new Set<Role>(["admin", "manager"]);
+const validRoles = new Set<Role>(ROLE_VALUES);
 
 function parseRole(role?: string): Role | null {
   if (role && validRoles.has(role as Role)) return role as Role;
